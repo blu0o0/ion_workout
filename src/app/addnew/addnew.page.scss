@@ -1,0 +1,63 @@
+.backbutton{
+    border-radius: 50px;
+    width: 30px;
+    height: 30px;
+    position: fixed;
+    left:90%;
+    top: 5px;
+    background-color: rgb(171, 171, 171);
+}
+
+h1{
+    margin-top: 40px;
+    align-self: center;
+    color:rgb(77, 77, 77);
+}
+
+.savebttn {
+    font-size: 15px;
+    background-color: rgb(147, 233, 162);
+    color: rgb(25, 55, 20);
+    border-radius: 5px;
+    width: 50px;
+    height: 30px;
+    margin-left: 70%;
+    margin-top: 20px;
+}
+
+    form {
+        display: grid;
+        grid-template-columns: 1fr 2fr; /* Label column + input column */
+        gap: 15px 20px; /* row gap, column gap */
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 80%;
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+        input, select, textarea {
+        padding: 8px;
+        border: 1.5px solid #afafaf;
+        border-radius: 4px;
+        font-size: 1rem;
+        width: 100%;
+        box-sizing: border-box;
+        background-color: white;
+    }
+
+    ion-select{
+        background-color: white;
+        border: 1.5px solid #afafaf;
+        border-radius: 4px;
+        padding-left: 10px;
+        height: 10px;
+    }
+    
+
+
+    label{
+        align-self: center;
+        color: black;
+        font-weight: bold;
+    }

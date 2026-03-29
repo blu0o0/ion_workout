@@ -1,0 +1,58 @@
+<button class="backbutton" (click)="gohome()"><</button>
+<h1><strong>ADD</strong></h1>
+
+<form #form="ngForm" (ngSubmit)="addProfile()">
+  <label>NAME</label>
+  <input 
+    type="text" 
+    name="name"
+    [(ngModel)]="name"
+    required>
+
+<label>GENDER</label>
+<div>
+<ion-item>
+  <ion-select 
+    [(ngModel)]="gender" 
+    name="gender"
+    interface="popover"
+    required>
+
+    <ion-select-option value="male">Male</ion-select-option>
+    <ion-select-option value="female">Female</ion-select-option>
+
+  </ion-select>
+</ion-item>
+  </div>
+
+  <label>AGE</label>
+  <input 
+    type="number" 
+    name="age"
+    [(ngModel)]="age"
+    required>
+
+  <label>WEIGHT (kg)</label>
+  <input 
+    type="number" 
+    name="weight"
+    [(ngModel)]="weight"
+    required>
+
+  <label>HEIGHT (cm)</label>
+  <input 
+    type="number" 
+    name="height"
+    [(ngModel)]="height"
+    required>
+
+  <br>
+
+  <button 
+    class="savebttn" 
+    type="submit"
+    [disabled]="form.invalid">
+    Save
+  </button>
+
+</form>
