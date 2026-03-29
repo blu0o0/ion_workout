@@ -2,11 +2,25 @@
 
   <h1><strong>My Workout Profiles</strong></h1>
 
+    <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Loading...">
+    </ion-refresher-content>
+  </ion-refresher>
+
    <div class="list">
     <ion-card *ngFor="let p of profiles; let i = index" (click)="openProfile(i)">
        <ion-card-content>
+        <div class="card-header">
           <p>{{ p.name }}</p>
-      </ion-card-content>
+     
+       <ion-button fill="clear" (click)="openMenu($event, i)">
+            ⋮
+          </ion-button>
+          </div>
+           </ion-card-content>
     </ion-card>
   </div>
 

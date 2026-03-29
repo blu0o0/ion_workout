@@ -22,6 +22,8 @@ export class ProfileService {
     return data ? JSON.parse(data) : [];
   }
 
+
+
   addProfile(profile: Profile) {
     const profiles = this.getProfiles();
     profiles.push(profile);
