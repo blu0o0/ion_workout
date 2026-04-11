@@ -58,60 +58,63 @@ goBack() {
   if (this.profile.workouts && this.profile.workouts.length > 0) {
     this.workouts = this.profile.workouts;
   } else {
+    // only generate ONCE
     this.generateWorkouts();
-    this.profile.workouts = [...this.workouts];
 
-    // save initial generated workouts once
+    // save generated workouts
+    this.profile.workouts = [...this.workouts];
     profiles[this.index] = this.profile;
+
     await this.profileService.setProfiles(profiles);
   }
 }
-  generateWorkouts() {
-    const p = this.profile;
-
-    // ✅ SAFETY CHECK
-    if (!p) return;
-
-    const intensity =
-      p.muscleMass === 'high' ? 6 :
-      p.muscleMass === 'moderate' ? 10 : 15;
-
-    const reps = p.age > 30 ? 10 : 15;
-
-    const workouts: any[] = [];
-
-    if (p.bodyParts?.includes('upper')) {
-      workouts.push({
-        name: 'Push Ups',
-        reps,
-        sets: intensity,
-        day: ['Monday'],
-        image: 'assets/pushup.jpg'
-      });
-    }
-
-    if (p.bodyParts?.includes('core')) {
-      workouts.push({
-        name: 'Plank',
-        reps: '30 sec',
-        sets: intensity,
-        day: ['wednesday'],
-        image: 'assets/plank.jpg'
-      });
-    }
-
-    if (p.bodyParts?.includes('lower')) {
-      workouts.push({
-        name: 'Squats',
-        reps,
-        sets: intensity,
-        day: ['Monday'],
-        image: 'assets/squats.jpg'
-      });
-    }
-
-    this.workouts = workouts;
+generateWorkouts() {
+  if (this.profile.workouts && this.profile.workouts.length > 0) {
+    return; // ❌ STOP if already exists
   }
+
+  const p = this.profile;
+
+  const intensity =
+    p.muscleMass === 'high' ? 6 :
+    p.muscleMass === 'moderate' ? 10 : 15;
+
+  const reps = p.age > 30 ? 10 : 15;
+
+  const workouts: any[] = [];
+
+  if (p.bodyParts?.includes('upper')) {
+    workouts.push({
+      name: 'Push Ups',
+      reps,
+      sets: intensity,
+      day: ['Monday'],
+      image: 'assets/pushup.jpg'
+    });
+  }
+
+  if (p.bodyParts?.includes('core')) {
+    workouts.push({
+      name: 'Plank',
+      reps: '30 sec',
+      sets: intensity,
+      day: ['Wednesday'],
+      image: 'assets/plank.jpg'
+    });
+  }
+
+  if (p.bodyParts?.includes('lower')) {
+    workouts.push({
+      name: 'Squats',
+      reps,
+      sets: intensity,
+      day: ['Friday'],
+      image: 'assets/squats.jpg'
+    });
+  }
+
+  this.workouts = workouts;
+}
 
   openWorkout(workout: any, i: number) {
     this.selectedWorkout = { ...workout };
@@ -148,14 +151,17 @@ async autoSave() {
 
   const profiles = await this.profileService.getProfiles();
 
-  // update workout instantly
+  // update workout
   this.workouts[this.selectedIndex] = {
     ...this.selectedWorkout
   };
 
-  this.profile.workouts = this.workouts;
+  // overwrite profile workouts
+  this.profile.workouts = [...this.workouts];
+
   profiles[this.index] = this.profile;
 
-  await this.profileService.setProfiles(profiles);
+  // SAVE
+  this.profileService.setProfiles(profiles);
 }
 }

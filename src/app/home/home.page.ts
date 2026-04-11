@@ -33,9 +33,9 @@ export class HomePage implements OnInit {
     await this.loadProfiles();
   }
 
-  async loadProfiles() {
-    this.profiles = await this.profileService.getProfiles();
-  }
+ loadProfiles() {
+  this.profiles = this.profileService.getProfiles();
+}
 
   async handleRefresh(event: any) {
     await this.loadProfiles();

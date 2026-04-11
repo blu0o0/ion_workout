@@ -27,13 +27,15 @@ export class ProfileService {
     this._storage = await this.storage.create();
   }
 
-  async getProfiles(): Promise<Profile[]> {
-    return (await this._storage?.get(this.storageKey)) || [];
+  getProfiles(): Profile[] {
+    const data = localStorage.getItem(this.storageKey);
+    return data ? JSON.parse(data) : [];
   }
 
-  async setProfiles(profiles: any[]) {
-  localStorage.setItem('profiles', JSON.stringify(profiles));
-}
+  setProfiles(profiles: Profile[]) {
+    localStorage.setItem(this.storageKey, JSON.stringify(profiles));
+  }
+
 
   async addProfile(profile: Profile) {
     const profiles = await this.getProfiles();
