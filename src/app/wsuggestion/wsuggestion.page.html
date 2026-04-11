@@ -19,16 +19,31 @@
 <ion-content>
 
   <!-- WORKOUT CARDS -->
-  <ion-card *ngFor="let w of workouts; let i = index" (click)="openWorkout(w, i)">
-    
-    <ion-card-content>
-      <h2><strong>{{ w.name }}</strong></h2>
-      <p>Reps: {{ w.reps }}</p>
-      <p>Sets: {{ w.sets }}</p>
-      <p>Day: {{ w.day }}</p>
-    </ion-card-content>
+<ion-card class="workout-card" *ngFor="let w of workouts; let i = index" (click)="openWorkout(w, i)">
 
-  </ion-card>
+  <ion-card-content>
+
+    <!-- TOP ROW -->
+    <div class="top-row">
+      <h2 class="name">{{ w.name }}</h2>
+
+      <span class="day">
+        {{ w.day?.join(', ') }}
+      </span>
+    </div>
+
+
+    <!-- BOTTOM ROW -->
+    <div class="bottom-row">
+      <div class="stats">
+        <p>Reps: {{ w.reps }}</p>
+        <p>Sets: {{ w.sets }}</p>
+      </div>
+    </div>
+
+  </ion-card-content>
+
+</ion-card>
 
 </ion-content>
 
@@ -54,7 +69,7 @@
 
 <!-- IMAGE -->
 <div class="workout-image-container">
-  <img [src]="selectedWorkout?.image" />
+  <img class="workout-full-image" [src]="selectedWorkout?.image" />
 </div>
 
 <!-- BOTTOM INFO (INSTAGRAM STYLE + EDITABLE) -->

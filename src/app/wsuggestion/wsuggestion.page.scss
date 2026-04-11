@@ -1,13 +1,18 @@
+/* IMAGE CONTAINER BOX */
 .workout-image-container {
   width: 100%;
-  height: 350px;
-  overflow: hidden;
+  height: 35vh;              /* fixed viewing box */
+  background: #cec0c0;          /* fills empty space nicely */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.workout-image-container img {
+/* FIT IMAGE INSIDE BOX (NO CROP, NO STRETCH) */
+.workout-fit-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;       /* 🔥 THIS IS THE KEY */
 }
 
 /* INSTAGRAM BOTTOM AREA */
@@ -41,4 +46,49 @@
 ion-input {
   font-size: 14px;
   text-align: center;
+}
+
+/* CARD BASE */
+.workout-card {
+  margin: 10px;
+}
+
+/* TOP ROW: NAME LEFT, DAY RIGHT */
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.name {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.day {
+  font-size: 12px;
+  color: gray;
+}
+
+/* IMAGE */
+.workout-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  margin: 10px 0;
+  border-radius: 10px;
+}
+
+/* BOTTOM ROW */
+.bottom-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.stats {
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+  color: #444;
 }
