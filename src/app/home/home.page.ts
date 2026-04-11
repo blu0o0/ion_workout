@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { ProfileService, Profile } from '../services/profile.service';
 import { 
   IonFab, IonContent, IonCard, IonCardContent, IonButton,
-  IonRefresher, IonRefresherContent
+  IonRefresher, IonRefresherContent,IonFabButton
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { ActionSheetController, ToastController } from '@ionic/angular';
@@ -15,6 +15,7 @@ import { ActionSheetController, ToastController } from '@ionic/angular';
   imports: [
     CommonModule, IonFab, IonCard, IonCardContent,
     IonContent, IonButton, IonRefresher, IonRefresherContent
+    ,IonFabButton
   ]
 })
 export class HomePage implements OnInit {
@@ -47,32 +48,34 @@ export class HomePage implements OnInit {
   });
 }
 
-  openProfile(index: number) {
-    this.router.navigate(['/profile', index]);
-  }
+ openProfile(index: number) {
+  this.router.navigate(['/wsuggestion', index]);
+}
 
-  async openMenu(index: number) {
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Options',
-      buttons: [
-        {
-          text: 'Edit',
-          handler: () => this.editProfile(index)
-        },
-        {
-          text: 'Delete',
-          role: 'destructive',
-          handler: () => this.confirmDelete(index)
-        },
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        }
-      ]
-    });
+  async openMenu(event: any, index: number) {
+  event.stopPropagation(); // ✅ BLOCKS card click
 
-    await actionSheet.present();
-  }
+  const actionSheet = await this.actionSheetController.create({
+    header: 'Options',
+    buttons: [
+      {
+        text: 'Edit',
+        handler: () => this.editProfile(index)
+      },
+      {
+        text: 'Delete',
+        role: 'destructive',
+        handler: () => this.confirmDelete(index)
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel'
+      }
+    ]
+  });
+
+  await actionSheet.present();
+}
 
   async confirmDelete(index: number) {
     const name = this.profiles[index].name;

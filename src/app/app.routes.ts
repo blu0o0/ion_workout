@@ -14,8 +14,8 @@ export const routes: Routes = [
     path: 'addnew',
     loadComponent: () => import('./addnew/addnew.page').then( m => m.AddnewPage)
   },
-  {
-    path: 'wsuggestion',
-    loadComponent: () => import('./wsuggestion/wsuggestion.page').then( m => m.WsuggestionPage)
-  },
+{
+  path: 'wsuggestion/:index',
+  loadComponent: () => import('./wsuggestion/wsuggestion.page').then(m => m.WsuggestionPage)
+}
 ];

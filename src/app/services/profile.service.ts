@@ -31,9 +31,9 @@ export class ProfileService {
     return (await this._storage?.get(this.storageKey)) || [];
   }
 
-  async setProfiles(profiles: Profile[]) {
-    await this._storage?.set(this.storageKey, profiles);
-  }
+  async setProfiles(profiles: any[]) {
+  localStorage.setItem('profiles', JSON.stringify(profiles));
+}
 
   async addProfile(profile: Profile) {
     const profiles = await this.getProfiles();

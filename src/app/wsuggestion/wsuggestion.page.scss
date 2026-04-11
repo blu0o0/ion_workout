@@ -1,0 +1,44 @@
+.workout-image-container {
+  width: 100%;
+  height: 350px;
+  overflow: hidden;
+}
+
+.workout-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* INSTAGRAM BOTTOM AREA */
+.workout-info {
+  padding: 12px;
+  background: white;
+}
+
+.workout-info h2 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+}
+
+.workout-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stat {
+  flex: 1;
+  text-align: center;
+}
+
+.stat p {
+  margin: 0;
+  font-size: 12px;
+  color: gray;
+}
+
+ion-input {
+  font-size: 14px;
+  text-align: center;
+}

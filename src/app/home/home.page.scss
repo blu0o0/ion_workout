@@ -51,3 +51,15 @@ ion-card {
   justify-content: space-between;
   align-items: center;
 }
+
+.profile-name {
+  flex: 1;
+}
+
+.menu-btn {
+  flex-shrink: 0;
+}
+
+ion-card {
+  position: relative;
+}
