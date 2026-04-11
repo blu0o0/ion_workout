@@ -46,6 +46,39 @@
     [(ngModel)]="height"
     required>
 
+    <!-- BODY PART GOAL -->
+<label>BODY PART GOAL</label>
+<ion-item>
+  <ion-select 
+    [(ngModel)]="bodyParts"
+    name="bodyParts"
+    multiple="true"
+    interface="popover"
+    required>
+
+    <ion-select-option value="upper">Upper</ion-select-option>
+    <ion-select-option value="core">Core</ion-select-option>
+    <ion-select-option value="lower">Lower</ion-select-option>
+
+  </ion-select>
+</ion-item>
+
+<!-- MUSCLE MASS -->
+<label>MUSCLE MASS</label>
+<ion-item>
+  <ion-select 
+    [(ngModel)]="muscleMass"
+    name="muscleMass"
+    interface="popover"
+    required>
+
+    <ion-select-option value="low">Low</ion-select-option>
+    <ion-select-option value="moderate">Moderate</ion-select-option>
+    <ion-select-option value="high">High</ion-select-option>
+
+  </ion-select>
+</ion-item>
+
   <br>
 
   <button 

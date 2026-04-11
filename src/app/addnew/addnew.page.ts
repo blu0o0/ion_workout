@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { IonItem, IonSelectOption, IonSelect } from '@ionic/angular/standalone';
 import { ProfileService } from '../services/profile.service';
 import { ToastController } from '@ionic/angular';
+
 @Component({
   selector: 'app-addnew',
   templateUrl: './addnew.page.html',
@@ -19,43 +20,81 @@ export class AddnewPage implements OnInit {
   age: any = '';
   weight: any = '';
   height: any = '';
+  bodyParts: String[] = [];
+muscleMass: any = '';
 
-constructor(
-  private router: Router,
-  private profileService: ProfileService,
-  private toastController: ToastController
-) {}
+  editIndex: number | null = null;
 
-async addProfile() {
-  const profile = {
-    name: this.name,
-    gender: this.gender,
-    age: Number(this.age),
-    weight: Number(this.weight),
-    height: Number(this.height)
-  };
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private profileService: ProfileService,
+    private toastController: ToastController
+  ) {}
 
-  this.profileService.addProfile(profile);
+  async ngOnInit() {
 
-  await this.showSavedToast();
+    this.route.queryParams.subscribe(params => {
+      if (params['index'] !== undefined) {
+        this.editIndex = Number(params['index']);
+        this.loadProfile(this.editIndex);
+      }
+    });
+  }
 
-  this.router.navigate(['/home']);
-}
+  async loadProfile(index: number) {
+    const profiles = await this.profileService.getProfiles();
+    const profile = profiles[index];
+
+    if (profile) {
+      this.name = profile.name;
+      this.gender = profile.gender;
+      this.age = profile.age;
+      this.weight = profile.weight;
+      this.height = profile.height;
+      this.bodyParts = profile.bodyParts || [];
+this.muscleMass = profile.muscleMass || '';
+    }
+  }
+
+  async addProfile() {
+    const profile = {
+      name: this.name,
+      gender: this.gender,
+      age: Number(this.age),
+      weight: Number(this.weight),
+      height: Number(this.height),
+      bodyParts: this.bodyParts,      
+  muscleMass: this.muscleMass 
+    };
+
+    if (this.editIndex !== null) {
+
+      const profiles = await this.profileService.getProfiles();
+      profiles[this.editIndex] = profile;
+      await this.profileService.setProfiles(profiles);
+    } else {
+ 
+      await this.profileService.addProfile(profile);
+    }
+
+    await this.showSavedToast();
+    this.router.navigate(['/home']);
+  }
 
   gohome() {
     this.router.navigate(['/home']);
   }
 
-  ngOnInit() {}
-
   async showSavedToast() {
-  const toast = await this.toastController.create({
-    message: 'Profile saved successfully!',
-    duration: 2000,
-    position: 'bottom'
-  });
+    const toast = await this.toastController.create({
+      message: this.editIndex !== null ? 'Profile updated!' : 'Profile saved!',
+      duration: 2000,
+      position: 'bottom'
+    });
 
-  await toast.present();
-}
+    await toast.present();
+  }
 
+  
 }

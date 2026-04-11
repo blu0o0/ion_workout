@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Storage } from '@ionic/storage-angular';
+import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 
 export interface Profile {
   name: string;
@@ -6,6 +8,8 @@ export interface Profile {
   age: number;
   weight: number;
   height: number;
+  bodyParts: String[];
+  muscleMass: String;
 }
 
 @Injectable({
@@ -14,20 +18,32 @@ export interface Profile {
 export class ProfileService {
 
   private storageKey = 'profiles';
+  private _storage: Storage | null = null;
 
-  constructor() {}
+  constructor(private storage: Storage) {}
 
-  getProfiles(): Profile[] {
-    const data = localStorage.getItem(this.storageKey);
-    return data ? JSON.parse(data) : [];
+  async init() {
+    await this.storage.defineDriver(CordovaSQLiteDriver);
+    this._storage = await this.storage.create();
   }
 
+  async getProfiles(): Promise<Profile[]> {
+    return (await this._storage?.get(this.storageKey)) || [];
+  }
 
+  async setProfiles(profiles: Profile[]) {
+    await this._storage?.set(this.storageKey, profiles);
+  }
 
-  addProfile(profile: Profile) {
-    const profiles = this.getProfiles();
+  async addProfile(profile: Profile) {
+    const profiles = await this.getProfiles();
     profiles.push(profile);
-    localStorage.setItem(this.storageKey, JSON.stringify(profiles));
+    await this.setProfiles(profiles);
   }
 
+  async deleteProfile(index: number) {
+    const profiles = await this.getProfiles();
+    profiles.splice(index, 1);
+    await this.setProfiles(profiles);
+  }
 }

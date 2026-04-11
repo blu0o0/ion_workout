@@ -2,111 +2,104 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProfileService, Profile } from '../services/profile.service';
 import { 
-  IonFab
-  ,IonContent,IonCard,IonCardContent,IonButton
-  ,IonRefresher,IonRefresherContent
-  } from '@ionic/angular/standalone';
+  IonFab, IonContent, IonCard, IonCardContent, IonButton,
+  IonRefresher, IonRefresherContent
+} from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { ActionSheetController, ToastController } from '@ionic/angular';
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [CommonModule,IonFab,IonCard,IonCardContent,IonContent
-    ,IonButton,IonRefresher,IonRefresherContent
-    
-
+  imports: [
+    CommonModule, IonFab, IonCard, IonCardContent,
+    IonContent, IonButton, IonRefresher, IonRefresherContent
   ]
 })
 export class HomePage implements OnInit {
 
-  handleRefresh(event: any) {
-  // simulate loading (optional delay)
-  setTimeout(() => {
-    this.loadProfiles(); // reload data
-
-    event.target.complete(); // stop spinner
-  }, 1000);
-}
-
-  profiles: any[] = [];
+  profiles: Profile[] = [];
 
   constructor(
     private profileService: ProfileService,
     private router: Router,
     private actionSheetController: ActionSheetController,
-  private toastController: ToastController
+    private toastController: ToastController
   ) {}
 
-  ngOnInit() {
-    this.loadProfiles();
+  async ngOnInit() {
+    await this.loadProfiles();
   }
 
-  loadProfiles() {
-    this.profiles = this.profileService.getProfiles();
+  async loadProfiles() {
+    this.profiles = await this.profileService.getProfiles();
+  }
+
+  async handleRefresh(event: any) {
+    await this.loadProfiles();
+    event.target.complete();
   }
 
   goToaddnew() {
-    this.router.navigate(['/addnew']); // change if your route is different
+    this.router.navigate(['/addnew']);
   }
 
   openProfile(index: number) {
-    this.router.navigate(['/profile', index]); // 4th page later
+    this.router.navigate(['/profile', index]);
   }
 
-  async openMenu(ev: any, index: number) {
-  const actionSheet = await this.actionSheetController.create({
-    header: 'Options',
-    buttons: [
-      {
-        text: 'Edit',
-        handler: () => {
-          this.editProfile(index);
+  async openMenu(index: number) {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Options',
+      buttons: [
+        {
+          text: 'Edit',
+          handler: () => this.editProfile(index)
+        },
+        {
+          text: 'Delete',
+          role: 'destructive',
+          handler: () => this.confirmDelete(index)
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel'
         }
-      },
-      {
-        text: 'Delete',
-        role: 'destructive',
-        handler: () => {
-          this.confirmDelete(index);
-        }
-      },
-      {
-        text: 'Cancel',
-        role: 'cancel'
-      }
-    ]
-  });
+      ]
+    });
 
-  await actionSheet.present();
-}
-
-async confirmDelete(index: number) {
-  const confirm = window.confirm('Are you sure you want to delete this profile?');
-
-  if (confirm) {
-    this.deleteProfile(index);
+    await actionSheet.present();
   }
-}
 
-deleteProfile(index: number) {
-  this.profiles.splice(index, 1);
-  localStorage.setItem('profiles', JSON.stringify(this.profiles));
-  this.showDeletedToast();
-}
+  async confirmDelete(index: number) {
+    const name = this.profiles[index].name;
+    const confirm = window.confirm(`Delete ${name}?`);
 
-async showDeletedToast() {
-  const toast = await this.toastController.create({
-    message: 'Deleted',
-    duration: 2000,
-    position: 'bottom'
-  });
+    if (confirm) {
+      await this.deleteProfile(index);
+    }
+  }
 
-  await toast.present();
-}
-editProfile(index: number) {
-  this.router.navigate(['/addnew'], {
-    queryParams: { index }
-  });
-}
+  async deleteProfile(index: number) {
+    await this.profileService.deleteProfile(index);
+    await this.loadProfiles();
+    await this.showDeletedToast();
+  }
+
+  async showDeletedToast() {
+    const toast = await this.toastController.create({
+      message: 'Deleted',
+      duration: 2000,
+      position: 'bottom'
+    });
+
+    await toast.present();
+  }
+
+  editProfile(index: number) {
+    this.router.navigate(['/addnew'], {
+      queryParams: { index }
+    });
+  }
 }
