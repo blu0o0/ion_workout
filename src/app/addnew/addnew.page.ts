@@ -34,13 +34,19 @@ muscleMass: any = '';
 
   async ngOnInit() {
 
-    this.route.queryParams.subscribe(params => {
-      if (params['index'] !== undefined) {
-        this.editIndex = Number(params['index']);
-        this.loadProfile(this.editIndex);
-      }
-    });
+this.route.queryParams.subscribe(params => {
+  if (params['index'] !== undefined && params['index'] !== null) {
+    this.editIndex = Number(params['index']);
+    this.loadProfile(this.editIndex);
+  } else {
+    this.resetForm(); // ✅ IMPORTANT
   }
+});
+  }
+
+  ionViewWillLeave() {
+  this.resetForm();
+}
 
   async loadProfile(index: number) {
     const profiles = await this.profileService.getProfiles();
@@ -78,8 +84,9 @@ this.muscleMass = profile.muscleMass || '';
       await this.profileService.addProfile(profile);
     }
 
-    await this.showSavedToast();
-    this.router.navigate(['/home']);
+   await this.showSavedToast();
+this.resetForm(); 
+this.router.navigate(['/home']);
   }
 
   gohome() {
@@ -96,5 +103,14 @@ this.muscleMass = profile.muscleMass || '';
     await toast.present();
   }
 
-  
+  resetForm() {
+  this.name = '';
+  this.gender = '';
+  this.age = '';
+  this.weight = '';
+  this.height = '';
+  this.bodyParts = [];
+  this.muscleMass = '';
+  this.editIndex = null;
+}
 }

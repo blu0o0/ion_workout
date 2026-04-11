@@ -42,8 +42,10 @@ export class HomePage implements OnInit {
   }
 
   goToaddnew() {
-    this.router.navigate(['/addnew']);
-  }
+  this.router.navigate(['/addnew'], {
+    queryParams: {} // clear edit mode
+  });
+}
 
   openProfile(index: number) {
     this.router.navigate(['/profile', index]);
