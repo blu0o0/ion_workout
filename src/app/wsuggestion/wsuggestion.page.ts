@@ -51,31 +51,31 @@ export class WsuggestionPage implements OnInit {
   }
 
   // =========================
-  // EXERCISE DATABASE
+  // EXERCISE DATABASE (IMPROVED)
+  // level = difficulty weight
   // =========================
-  EXERCISES: Record<BodyPart, { name: string; img: string; level: number }[]> = {
+  EXERCISES: Record<BodyPart, any[]> = {
     upper: [
-      { name: 'Push-up', img: 'assets/pushup.jpg', level: 1 },
       { name: 'Wall push-up', img: 'assets/wallpushup.jpg', level: 1 },
-      { name: 'Chair dips', img: 'assets/chairdips.jpg', level: 2 },
-      { name: 'Dumbbell shoulder press', img: 'assets/shoulderpress.jpg', level: 3 },
-      { name: 'Dumbbell curl', img: 'assets/curl.jpg', level: 2 },
-      { name: 'Seated shoulder press', img: 'assets/seatedshoulder.jpg', level: 3 }
+      { name: 'Push-up', img: 'assets/pushup.jpg', level: 2 },
+      { name: 'Chair dips', img: 'assets/chairdips.jpg', level: 3 },
+      { name: 'Dumbbell curl', img: 'assets/curl.jpg', level: 3 },
+      { name: 'Dumbbell shoulder press', img: 'assets/shoulderpress.jpg', level: 4 }
     ],
 
     core: [
-      { name: 'Plank', img: 'assets/plank.jpg', level: 1 },
       { name: 'Plank (knees)', img: 'assets/plankknees.jpg', level: 1 },
-      { name: 'Sit-ups', img: 'assets/situps.jpg', level: 2 },
-      { name: 'Russian twist', img: 'assets/russiantwist.jpg', level: 2 },
-      { name: 'Leg raises', img: 'assets/legraises.jpg', level: 3 }
+      { name: 'Plank', img: 'assets/plank.jpg', level: 2 },
+      { name: 'Sit-ups', img: 'assets/situps.jpg', level: 3 },
+      { name: 'Russian twist', img: 'assets/russiantwist.jpg', level: 3 },
+      { name: 'Leg raises', img: 'assets/legraises.jpg', level: 4 }
     ],
 
     lower: [
       { name: 'Chair squat', img: 'assets/chairsquat.jpg', level: 1 },
       { name: 'Squat', img: 'assets/squat.jpg', level: 2 },
-      { name: 'Lunges', img: 'assets/lunges.jpg', level: 3 },
-      { name: 'Glute bridge', img: 'assets/glutebridge.jpg', level: 2 }
+      { name: 'Glute bridge', img: 'assets/glutebridge.jpg', level: 3 },
+      { name: 'Lunges', img: 'assets/lunges.jpg', level: 4 }
     ]
   };
 
@@ -100,61 +100,90 @@ export class WsuggestionPage implements OnInit {
   }
 
   // =========================
-  // SMART DIFFICULTY
+  // FITNESS LEVEL
   // =========================
-  getDifficulty() {
+  getLevel() {
     const mass = this.profile.muscleMass;
 
-    if (mass === 'high') return { sets: 4, reps: 12, count: 5 };
-    if (mass === 'moderate') return { sets: 3, reps: 10, count: 4 };
+    if (mass === 'high') return { reps: 12, sets: 4, count: 6, days: 6 };
+    if (mass === 'moderate') return { reps: 10, sets: 3, count: 5, days: 5 };
 
-    return { sets: 2, reps: 8, count: 3 }; // low
+    return { reps: 8, sets: 2, count: 3, days: 4 };
   }
 
   // =========================
-  // SMART GENERATOR
+  // SMART DAY SYSTEM
+  // NO SAME MUSCLE BACK-TO-BACK
+  // =========================
+  buildSchedule(selected: BodyPart[], daysCount: number) {
+
+    const allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    const schedule: Record<number, BodyPart> = {};
+
+    let dayIndex = 0;
+    let lastPart: BodyPart | null = null;
+
+    for (let i = 0; i < daysCount; i++) {
+
+      let part = selected[i % selected.length];
+
+      // avoid same muscle twice in a row
+      if (part === lastPart) {
+        part = selected[(i + 1) % selected.length];
+      }
+
+      schedule[dayIndex] = part;
+      lastPart = part;
+      dayIndex++;
+    }
+
+    return { schedule, days: allDays.slice(0, daysCount) };
+  }
+
+  // =========================
+  // MAIN GENERATOR (IMPROVED AI STYLE)
   // =========================
   generateWorkouts() {
 
-    const difficulty = this.getDifficulty();
-    const workouts: any[] = [];
-
+    const level = this.getLevel();
     const selectedParts: BodyPart[] = this.profile.bodyParts || [];
 
-    const DAY_MAP: Record<BodyPart, string[]> = {
-      upper: ['Monday', 'Thursday'],
-      core: ['Tuesday', 'Friday'],
-      lower: ['Wednesday', 'Saturday']
-    };
+    const { schedule, days } = this.buildSchedule(selectedParts, level.days);
 
-    selectedParts.forEach((part) => {
+    const workouts: any[] = [];
+
+    let dayCounter = 0;
+
+    days.forEach((day) => {
+
+      const part = schedule[dayCounter];
 
       const pool = this.EXERCISES[part];
 
-      // SORT by difficulty (easy → hard based on level)
-      const sorted = [...pool].sort((a, b) => a.level - b.level);
+      const sorted = [...pool]
+        .sort((a, b) => a.level - b.level)
+        .slice(0, level.count);
 
-      // pick ONLY best exercises based on difficulty
-      const picked = sorted.slice(0, difficulty.count);
-
-      picked.forEach((ex, i) => {
-
+      sorted.forEach((ex) => {
         workouts.push({
           name: ex.name,
           image: ex.img,
-          reps: difficulty.reps,
-          sets: difficulty.sets,
-          day: [DAY_MAP[part][i % DAY_MAP[part].length]]
+          reps: level.reps,
+          sets: level.sets,
+          day: [day],
+          part
         });
-
       });
+
+      dayCounter++;
     });
 
     return workouts;
   }
 
   // =========================
-  // OPEN WORKOUT
+  // OPEN MODAL
   // =========================
   openWorkout(workout: any, i: number) {
     this.selectedWorkout = { ...workout };
@@ -172,6 +201,7 @@ export class WsuggestionPage implements OnInit {
   // AUTO SAVE
   // =========================
   async autoSave() {
+
     if (this.selectedIndex === null) return;
 
     const profiles = await this.profileService.getProfiles();
