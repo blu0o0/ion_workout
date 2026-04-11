@@ -1,16 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 
 import {
   IonHeader, IonToolbar, IonTitle,
   IonContent, IonCard, IonCardContent,
-  IonModal, IonButton, IonItem, IonInput,IonLabel,IonSelect,IonSelectOption
+  IonModal, IonButton, IonItem, IonInput,
+  IonLabel, IonSelect, IonSelectOption
 } from '@ionic/angular/standalone';
 
 import { ProfileService } from '../services/profile.service';
+
+type BodyPart = 'upper' | 'core' | 'lower';
 
 @Component({
   selector: 'app-wsuggestion',
@@ -18,13 +20,13 @@ import { ProfileService } from '../services/profile.service';
   styleUrls: ['./wsuggestion.page.scss'],
   standalone: true,
   imports: [
-  CommonModule,
-  FormsModule, // ✅ ADD THIS
-
-  IonHeader, IonToolbar, IonTitle,
-  IonContent, IonCard, IonCardContent,
-  IonModal, IonButton, IonItem, IonInput, IonLabel,IonSelect,IonSelectOption
-]
+    CommonModule,
+    FormsModule,
+    IonHeader, IonToolbar, IonTitle,
+    IonContent, IonCard, IonCardContent,
+    IonModal, IonButton, IonItem, IonInput,
+    IonLabel, IonSelect, IonSelectOption
+  ]
 })
 export class WsuggestionPage implements OnInit {
 
@@ -38,84 +40,122 @@ export class WsuggestionPage implements OnInit {
 
   isModalOpen = false;
 
- constructor(
-  private route: ActivatedRoute,
-  private profileService: ProfileService,
-  private router: Router   // ✅ ADD THIS
-) {}
+  constructor(
+    private route: ActivatedRoute,
+    private profileService: ProfileService,
+    private router: Router
+  ) {}
 
-goBack() {
-  this.router.navigate(['/home']);
-}
-
- async ngOnInit() {
-  this.index = Number(this.route.snapshot.paramMap.get('index'));
-
-  const profiles = await this.profileService.getProfiles();
-  this.profile = profiles[this.index];
-
-  // ✅ USE SAVED WORKOUTS IF THEY EXIST
-  if (this.profile.workouts && this.profile.workouts.length > 0) {
-    this.workouts = this.profile.workouts;
-  } else {
-    // only generate ONCE
-    this.generateWorkouts();
-
-    // save generated workouts
-    this.profile.workouts = [...this.workouts];
-    profiles[this.index] = this.profile;
-
-    await this.profileService.setProfiles(profiles);
-  }
-}
-generateWorkouts() {
-  if (this.profile.workouts && this.profile.workouts.length > 0) {
-    return; // ❌ STOP if already exists
+  goBack() {
+    this.router.navigate(['/home']);
   }
 
-  const p = this.profile;
+  // =========================
+  // EXERCISE DATABASE
+  // =========================
+  EXERCISES: Record<BodyPart, { name: string; img: string; level: number }[]> = {
+    upper: [
+      { name: 'Push-up', img: 'assets/pushup.jpg', level: 1 },
+      { name: 'Wall push-up', img: 'assets/wallpushup.jpg', level: 1 },
+      { name: 'Chair dips', img: 'assets/chairdips.jpg', level: 2 },
+      { name: 'Dumbbell shoulder press', img: 'assets/shoulderpress.jpg', level: 3 },
+      { name: 'Dumbbell curl', img: 'assets/curl.jpg', level: 2 },
+      { name: 'Seated shoulder press', img: 'assets/seatedshoulder.jpg', level: 3 }
+    ],
 
-  const intensity =
-    p.muscleMass === 'high' ? 6 :
-    p.muscleMass === 'moderate' ? 10 : 15;
+    core: [
+      { name: 'Plank', img: 'assets/plank.jpg', level: 1 },
+      { name: 'Plank (knees)', img: 'assets/plankknees.jpg', level: 1 },
+      { name: 'Sit-ups', img: 'assets/situps.jpg', level: 2 },
+      { name: 'Russian twist', img: 'assets/russiantwist.jpg', level: 2 },
+      { name: 'Leg raises', img: 'assets/legraises.jpg', level: 3 }
+    ],
 
-  const reps = p.age > 30 ? 10 : 15;
+    lower: [
+      { name: 'Chair squat', img: 'assets/chairsquat.jpg', level: 1 },
+      { name: 'Squat', img: 'assets/squat.jpg', level: 2 },
+      { name: 'Lunges', img: 'assets/lunges.jpg', level: 3 },
+      { name: 'Glute bridge', img: 'assets/glutebridge.jpg', level: 2 }
+    ]
+  };
 
-  const workouts: any[] = [];
+  // =========================
+  // INIT
+  // =========================
+  async ngOnInit() {
+    this.index = Number(this.route.snapshot.paramMap.get('index'));
 
-  if (p.bodyParts?.includes('upper')) {
-    workouts.push({
-      name: 'Push Ups',
-      reps,
-      sets: intensity,
-      day: ['Monday'],
-      image: 'assets/pushup.jpg'
+    const profiles = await this.profileService.getProfiles();
+    this.profile = profiles[this.index];
+
+    if (this.profile.workouts?.length) {
+      this.workouts = this.profile.workouts;
+    } else {
+      this.workouts = this.generateWorkouts();
+      this.profile.workouts = this.workouts;
+
+      profiles[this.index] = this.profile;
+      await this.profileService.setProfiles(profiles);
+    }
+  }
+
+  // =========================
+  // SMART DIFFICULTY
+  // =========================
+  getDifficulty() {
+    const mass = this.profile.muscleMass;
+
+    if (mass === 'high') return { sets: 4, reps: 12, count: 5 };
+    if (mass === 'moderate') return { sets: 3, reps: 10, count: 4 };
+
+    return { sets: 2, reps: 8, count: 3 }; // low
+  }
+
+  // =========================
+  // SMART GENERATOR
+  // =========================
+  generateWorkouts() {
+
+    const difficulty = this.getDifficulty();
+    const workouts: any[] = [];
+
+    const selectedParts: BodyPart[] = this.profile.bodyParts || [];
+
+    const DAY_MAP: Record<BodyPart, string[]> = {
+      upper: ['Monday', 'Thursday'],
+      core: ['Tuesday', 'Friday'],
+      lower: ['Wednesday', 'Saturday']
+    };
+
+    selectedParts.forEach((part) => {
+
+      const pool = this.EXERCISES[part];
+
+      // SORT by difficulty (easy → hard based on level)
+      const sorted = [...pool].sort((a, b) => a.level - b.level);
+
+      // pick ONLY best exercises based on difficulty
+      const picked = sorted.slice(0, difficulty.count);
+
+      picked.forEach((ex, i) => {
+
+        workouts.push({
+          name: ex.name,
+          image: ex.img,
+          reps: difficulty.reps,
+          sets: difficulty.sets,
+          day: [DAY_MAP[part][i % DAY_MAP[part].length]]
+        });
+
+      });
     });
+
+    return workouts;
   }
 
-  if (p.bodyParts?.includes('core')) {
-    workouts.push({
-      name: 'Plank',
-      reps: '30 sec',
-      sets: intensity,
-      day: ['Wednesday'],
-      image: 'assets/plank.jpg'
-    });
-  }
-
-  if (p.bodyParts?.includes('lower')) {
-    workouts.push({
-      name: 'Squats',
-      reps,
-      sets: intensity,
-      day: ['Friday'],
-      image: 'assets/squats.jpg'
-    });
-  }
-
-  this.workouts = workouts;
-}
-
+  // =========================
+  // OPEN WORKOUT
+  // =========================
   openWorkout(workout: any, i: number) {
     this.selectedWorkout = { ...workout };
     this.selectedIndex = i;
@@ -128,40 +168,22 @@ generateWorkouts() {
     this.selectedIndex = null;
   }
 
-async saveWorkout() {
-  if (this.selectedIndex === null) return;
+  // =========================
+  // AUTO SAVE
+  // =========================
+  async autoSave() {
+    if (this.selectedIndex === null) return;
 
-  const profiles = await this.profileService.getProfiles();
+    const profiles = await this.profileService.getProfiles();
 
-  // 🔥 OVERWRITE suggested workout directly
-  this.workouts[this.selectedIndex] = {
-    ...this.selectedWorkout
-  };
+    this.workouts[this.selectedIndex] = {
+      ...this.selectedWorkout
+    };
 
-  // 🔥 SAVE BACK TO PROFILE
-  this.profile.workouts = this.workouts;
+    this.profile.workouts = this.workouts;
 
-  profiles[this.index] = this.profile;
+    profiles[this.index] = this.profile;
 
-  await this.profileService.setProfiles(profiles);
-
-}
-async autoSave() {
-  if (this.selectedIndex === null) return;
-
-  const profiles = await this.profileService.getProfiles();
-
-  // update workout
-  this.workouts[this.selectedIndex] = {
-    ...this.selectedWorkout
-  };
-
-  // overwrite profile workouts
-  this.profile.workouts = [...this.workouts];
-
-  profiles[this.index] = this.profile;
-
-  // SAVE
-  this.profileService.setProfiles(profiles);
-}
+    await this.profileService.setProfiles(profiles);
+  }
 }
