@@ -39,7 +39,7 @@ this.route.queryParams.subscribe(params => {
     this.editIndex = Number(params['index']);
     this.loadProfile(this.editIndex);
   } else {
-    this.resetForm(); // ✅ IMPORTANT
+    this.resetForm(); 
   }
 });
   }

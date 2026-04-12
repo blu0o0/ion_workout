@@ -50,10 +50,6 @@ export class WsuggestionPage implements OnInit {
     this.router.navigate(['/home']);
   }
 
-  // =========================
-  // EXERCISE DATABASE (IMPROVED)
-  // level = difficulty weight
-  // =========================
   EXERCISES: Record<BodyPart, any[]> = {
     upper: [
       { name: 'Wall push-up', img: 'assets/wallpushup.jpg', level: 1 },
@@ -79,9 +75,6 @@ export class WsuggestionPage implements OnInit {
     ]
   };
 
-  // =========================
-  // INIT
-  // =========================
   async ngOnInit() {
     this.index = Number(this.route.snapshot.paramMap.get('index'));
 
@@ -99,9 +92,6 @@ export class WsuggestionPage implements OnInit {
     }
   }
 
-  // =========================
-  // FITNESS LEVEL
-  // =========================
   getLevel() {
     const mass = this.profile.muscleMass;
 
@@ -111,10 +101,6 @@ export class WsuggestionPage implements OnInit {
     return { reps: 8, sets: 2, count: 3, days: 4 };
   }
 
-  // =========================
-  // SMART DAY SYSTEM
-  // NO SAME MUSCLE BACK-TO-BACK
-  // =========================
   buildSchedule(selected: BodyPart[], daysCount: number) {
 
     const allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -128,7 +114,6 @@ export class WsuggestionPage implements OnInit {
 
       let part = selected[i % selected.length];
 
-      // avoid same muscle twice in a row
       if (part === lastPart) {
         part = selected[(i + 1) % selected.length];
       }
@@ -141,9 +126,6 @@ export class WsuggestionPage implements OnInit {
     return { schedule, days: allDays.slice(0, daysCount) };
   }
 
-  // =========================
-  // MAIN GENERATOR (IMPROVED AI STYLE)
-  // =========================
   generateWorkouts() {
 
     const level = this.getLevel();
@@ -182,9 +164,6 @@ export class WsuggestionPage implements OnInit {
     return workouts;
   }
 
-  // =========================
-  // OPEN MODAL
-  // =========================
   openWorkout(workout: any, i: number) {
     this.selectedWorkout = { ...workout };
     this.selectedIndex = i;
@@ -197,9 +176,6 @@ export class WsuggestionPage implements OnInit {
     this.selectedIndex = null;
   }
 
-  // =========================
-  // AUTO SAVE
-  // =========================
   async autoSave() {
 
     if (this.selectedIndex === null) return;

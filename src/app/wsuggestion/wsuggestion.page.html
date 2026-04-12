@@ -1,12 +1,10 @@
 <ion-header>
   <ion-toolbar>
 
-    <!-- BACK BUTTON -->
     <ion-button fill="clear" slot="start" (click)="goBack()">
       ←
     </ion-button>
 
-    <!-- PROFILE NAME -->
     <ion-title>
       {{ profile?.name }}'s Workout
     </ion-title>
@@ -18,12 +16,10 @@
 
 <ion-content>
 
-  <!-- WORKOUT CARDS -->
 <ion-card class="workout-card" *ngFor="let w of workouts; let i = index" (click)="openWorkout(w, i)">
 
   <ion-card-content>
 
-    <!-- TOP ROW -->
     <div class="top-row">
       <h2 class="name">{{ w.name }}</h2>
 
@@ -33,7 +29,6 @@
     </div>
 
 
-    <!-- BOTTOM ROW -->
     <div class="bottom-row">
       <div class="stats">
         <p>Reps: {{ w.reps }}</p>
@@ -53,7 +48,6 @@
 <ion-header>
   <ion-toolbar>
 
-    <!-- BACK BUTTON (TOP LEFT) -->
     <ion-button fill="clear" slot="start" (click)="closeModal()">
       ←
     </ion-button>
@@ -67,12 +61,10 @@
 
       
 
-<!-- IMAGE -->
 <div class="workout-image-container">
   <img class="workout-full-image" [src]="selectedWorkout?.image" />
 </div>
 
-<!-- BOTTOM INFO (INSTAGRAM STYLE + EDITABLE) -->
 <div class="workout-info">
 
 <div class="workout-stats">

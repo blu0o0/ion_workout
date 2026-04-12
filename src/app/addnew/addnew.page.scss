@@ -16,8 +16,8 @@ h1{
 
 .savebttn {
     font-size: 15px;
-    background-color: rgb(147, 233, 162);
-    color: rgb(25, 55, 20);
+    background-color: rgb(106, 153, 96);
+    color: rgb(255, 255, 255);
     border-radius: 5px;
     width: 50px;
     height: 30px;
@@ -27,8 +27,8 @@ h1{
 
     form {
         display: grid;
-        grid-template-columns: 1fr 2fr; /* Label column + input column */
-        gap: 15px 20px; /* row gap, column gap */
+        grid-template-columns: 1fr 2fr;
+        gap: 15px 20px; 
         background: white;
         padding: 40px;
         border-radius: 15px;

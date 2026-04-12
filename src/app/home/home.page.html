@@ -1,6 +1,6 @@
 <ion-content>
 
-  <h1><strong>My Workout Profiles</strong></h1>
+  <h1>My Workout Profiles</h1>
 
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content
@@ -18,12 +18,10 @@
 
         <div class="card-header">
 
-          <!-- LEFT: NAME -->
           <div class="profile-name">
             <p>{{ p.name }}</p>
           </div>
 
-          <!-- RIGHT: MENU -->
           <div class="menu-btn">
             <ion-button fill="clear" (click)="openMenu($event, i)">
   ⋮
@@ -38,7 +36,6 @@
 
   </div>
 
-  <!-- FAB FIX -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end" (click)="goToaddnew()">
       +
   </ion-fab>
