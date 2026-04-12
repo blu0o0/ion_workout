@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProfileService, Profile } from '../services/profile.service';
-import { 
+import {
   IonFab, IonContent, IonCard, IonCardContent, IonButton,
-  IonRefresher, IonRefresherContent,IonFabButton
+  IonRefresher, IonRefresherContent, IonFabButton
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { ActionSheetController, ToastController } from '@ionic/angular';
@@ -12,10 +12,13 @@ import { ActionSheetController, ToastController } from '@ionic/angular';
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
+  standalone: true,
   imports: [
-    CommonModule, IonFab, IonCard, IonCardContent,
-    IonContent, IonButton, IonRefresher, IonRefresherContent
-    ,IonFabButton
+    CommonModule,
+    IonFab, IonCard, IonCardContent,
+    IonContent, IonButton,
+    IonRefresher, IonRefresherContent,
+    IonFabButton
   ]
 })
 export class HomePage implements OnInit {
@@ -29,13 +32,16 @@ export class HomePage implements OnInit {
     private toastController: ToastController
   ) {}
 
-  async ngOnInit() {
-    await this.loadProfiles();
+  ngOnInit() {}
+
+  // 🔥 THIS IS THE KEY FIX (runs every time you return to page)
+  ionViewWillEnter() {
+    this.loadProfiles();
   }
 
- loadProfiles() {
-  this.profiles = this.profileService.getProfiles();
-}
+  async loadProfiles() {
+    this.profiles = await this.profileService.getProfiles();
+  }
 
   async handleRefresh(event: any) {
     await this.loadProfiles();
@@ -43,45 +49,43 @@ export class HomePage implements OnInit {
   }
 
   goToaddnew() {
-  this.router.navigate(['/addnew'], {
-    queryParams: {} // clear edit mode
-  });
-}
+    this.router.navigateByUrl('/addnew');
+  }
 
- openProfile(index: number) {
-  this.router.navigate(['/wsuggestion', index]);
-}
+  openProfile(index: number) {
+    this.router.navigate(['/wsuggestion', index]);
+  }
 
   async openMenu(event: any, index: number) {
-  event.stopPropagation(); // ✅ BLOCKS card click
+    event.stopPropagation();
 
-  const actionSheet = await this.actionSheetController.create({
-    header: 'Options',
-    buttons: [
-      {
-        text: 'Edit',
-        handler: () => this.editProfile(index)
-      },
-      {
-        text: 'Delete',
-        role: 'destructive',
-        handler: () => this.confirmDelete(index)
-      },
-      {
-        text: 'Cancel',
-        role: 'cancel'
-      }
-    ]
-  });
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Options',
+      buttons: [
+        {
+          text: 'Edit',
+          handler: () => this.editProfile(index)
+        },
+        {
+          text: 'Delete',
+          role: 'destructive',
+          handler: () => this.confirmDelete(index)
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        }
+      ]
+    });
 
-  await actionSheet.present();
-}
+    await actionSheet.present();
+  }
 
   async confirmDelete(index: number) {
     const name = this.profiles[index].name;
-    const confirm = window.confirm(`Delete ${name}?`);
+    const confirmDelete = window.confirm(`Delete ${name}?`);
 
-    if (confirm) {
+    if (confirmDelete) {
       await this.deleteProfile(index);
     }
   }

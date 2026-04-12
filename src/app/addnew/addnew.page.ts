@@ -21,7 +21,7 @@ export class AddnewPage implements OnInit {
   weight: any = '';
   height: any = '';
   bodyParts: String[] = [];
-muscleMass: any = '';
+  muscleMass: any = '';
 
   editIndex: number | null = null;
 
@@ -32,21 +32,16 @@ muscleMass: any = '';
     private toastController: ToastController
   ) {}
 
-  async ngOnInit() {
-
-this.route.queryParams.subscribe(params => {
-  if (params['index'] !== undefined && params['index'] !== null) {
-    this.editIndex = Number(params['index']);
-    this.loadProfile(this.editIndex);
-  } else {
-    this.resetForm(); 
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      if (params['index'] !== undefined) {
+        this.editIndex = Number(params['index']);
+        this.loadProfile(this.editIndex);
+      } else {
+        this.resetForm();
+      }
+    });
   }
-});
-  }
-
-  ionViewWillLeave() {
-  this.resetForm();
-}
 
   async loadProfile(index: number) {
     const profiles = await this.profileService.getProfiles();
@@ -59,7 +54,7 @@ this.route.queryParams.subscribe(params => {
       this.weight = profile.weight;
       this.height = profile.height;
       this.bodyParts = profile.bodyParts || [];
-this.muscleMass = profile.muscleMass || '';
+      this.muscleMass = profile.muscleMass || '';
     }
   }
 
@@ -70,47 +65,49 @@ this.muscleMass = profile.muscleMass || '';
       age: Number(this.age),
       weight: Number(this.weight),
       height: Number(this.height),
-      bodyParts: this.bodyParts,      
-  muscleMass: this.muscleMass 
+      bodyParts: this.bodyParts,
+      muscleMass: this.muscleMass
     };
 
-    if (this.editIndex !== null) {
+    const profiles = await this.profileService.getProfiles();
 
-      const profiles = await this.profileService.getProfiles();
+    if (this.editIndex !== null) {
       profiles[this.editIndex] = profile;
       await this.profileService.setProfiles(profiles);
     } else {
- 
       await this.profileService.addProfile(profile);
     }
 
-   await this.showSavedToast();
-this.resetForm(); 
-this.router.navigate(['/home']);
-  }
+    this.showSavedToast();
 
-  gohome() {
-    this.router.navigate(['/home']);
+    // 🚀 IMPORTANT: navigate immediately (Android-safe)
+    this.router.navigateByUrl('/home', { replaceUrl: true });
+
+    this.resetForm();
   }
 
   async showSavedToast() {
     const toast = await this.toastController.create({
       message: this.editIndex !== null ? 'Profile updated!' : 'Profile saved!',
-      duration: 2000,
+      duration: 1000,
       position: 'bottom'
     });
 
     await toast.present();
   }
 
+  gohome() {
+    this.router.navigateByUrl('/home', { replaceUrl: true });
+  }
+
   resetForm() {
-  this.name = '';
-  this.gender = '';
-  this.age = '';
-  this.weight = '';
-  this.height = '';
-  this.bodyParts = [];
-  this.muscleMass = '';
-  this.editIndex = null;
-}
+    this.name = '';
+    this.gender = '';
+    this.age = '';
+    this.weight = '';
+    this.height = '';
+    this.bodyParts = [];
+    this.muscleMass = '';
+    this.editIndex = null;
+  }
 }
